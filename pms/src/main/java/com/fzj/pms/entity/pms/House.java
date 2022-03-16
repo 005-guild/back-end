@@ -13,7 +13,7 @@ import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 
 @Data
-@Table(name = "p_house")
+@Table(name = "t_house")
 @Entity
 @EqualsAndHashCode(callSuper = true)
 public class House extends Base {

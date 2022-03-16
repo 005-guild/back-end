@@ -13,7 +13,7 @@ import javax.validation.constraints.NotNull;
 @Data
 @EqualsAndHashCode(callSuper = true)
 @Entity
-@Table(name="p_message")
+@Table(name="t_message")
 public class Message extends Base {
 
     @NotNull(message = "发件人不能为空")

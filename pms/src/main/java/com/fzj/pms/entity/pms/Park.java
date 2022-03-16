@@ -15,7 +15,7 @@ import javax.validation.constraints.NotNull;
 import java.util.Date;
 
 @Data
-@Table(name = "p_park")
+@Table(name = "t_park")
 @Entity
 @EqualsAndHashCode(callSuper = true)
 public class Park extends Base{

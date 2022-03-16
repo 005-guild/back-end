@@ -16,7 +16,7 @@ import javax.validation.constraints.Pattern;
 @Data
 @EqualsAndHashCode(callSuper = true)
 @Entity
-@Table(name = "p_board")
+@Table(name = "t_board")
 public class Board extends Base {
 
     @NotNull(message = "发布公告人不能为空")

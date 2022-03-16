@@ -14,7 +14,7 @@ import java.util.Date;
 @Data
 @EqualsAndHashCode(callSuper = true)
 @Entity
-@Table(name = "p_opinion")
+@Table(name = "t_opinion")
 public class Opinion extends Base {
 
     @NotNull(message = "意见发起人不能为空")

@@ -13,7 +13,7 @@ import javax.validation.constraints.NotNull;
 
 @Data
 @Entity
-@Table(name="p_comment")
+@Table(name="t_comment")
 @EqualsAndHashCode(callSuper = true)
 public class Comment extends Base {
 
