@@ -30,9 +30,6 @@ import java.util.Collection;
 @Data
 @Entity
 @Table(name="t_user")
-@ApiModel("用户")
-@SQLDelete(sql = "update t_user set delete_flag="+ Constants.DELETED+" where id= ?")
-@Where(clause = "delete_flag="+ Constants.NORMEL)
 public class User extends Base implements UserDetails{
 
     @NotBlank(message = "用户名不能为空")

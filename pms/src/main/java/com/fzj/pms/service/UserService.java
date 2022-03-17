@@ -3,19 +3,18 @@ package com.fzj.pms.service;
 import com.fzj.pms.entity.dto.UserDto;
 import com.fzj.pms.entity.security.User;
 import com.fzj.pms.entity.vo.UserVo;
-import org.springframework.security.core.userdetails.UserDetailsService;
 
 import java.util.List;
 import java.util.Optional;
 
-public interface UserService extends UserDetailsService {
+public interface UserService {
 
     /**
      * 查询当前用户信息
      *
      * @return
      */
-    Optional<UserDto> getCurrUserInfo();
+    //Optional<UserDto> getCurrUserInfo();
 
     /**
      * 注册用户
@@ -45,6 +44,13 @@ public interface UserService extends UserDetailsService {
      *
      * @return
      */
+    List<UserDto> findAllList();
+
+    /**
+     * 查询全部用户列表
+     *
+     * @return
+     */
     List<UserDto> findAllListSortCreateTime();
 
     /**
@@ -68,16 +74,16 @@ public interface UserService extends UserDetailsService {
      */
     Optional<UserDto> findUser(Long id);
 
-    /**
-     * 更新密码
-     * @param userVo
-     */
-    int updatePassword(UserVo userVo);
-
-
-    /**
-     * 重值密码
-     * @param userId
-     */
-    void resetPassword(Long userId);
+//    /**
+//     * 更新密码
+//     * @param userVo
+//     */
+//    int updatePassword(UserVo userVo);
+//
+//
+//    /**
+//     * 重值密码
+//     * @param userId
+//     */
+//    void resetPassword(Long userId);
 }

@@ -23,9 +23,6 @@ import java.util.Set;
 @Table(name="t_role")
 @Getter
 @Setter
-@ApiModel("角色")
-@SQLDelete(sql = "update t_role set delete_flag="+ Constants.DELETED+" where id= ?")
-@Where(clause = "delete_flag="+ Constants.NORMEL)
 public class Role extends Base {
 
     @Column(length = 25)

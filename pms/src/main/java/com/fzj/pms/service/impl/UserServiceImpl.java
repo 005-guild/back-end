@@ -14,11 +14,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -27,13 +22,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-
-/**
- * @program: UserServiceImpl
- * @description:
- * @author: fzy
- * @date: 2019/03/16 18:46:52
- **/
 
 @Service("userService")
 public class UserServiceImpl implements UserService {
@@ -44,8 +32,8 @@ public class UserServiceImpl implements UserService {
     @Autowired
     private RoleRepository roleRepository;
 
-    @Autowired
-    private BCryptPasswordEncoder bCryptPasswordEncoder;
+//    @Autowired
+//    private BCryptPasswordEncoder bCryptPasswordEncoder;
 
     @Resource
     private UserMapper userMapper;
@@ -53,51 +41,53 @@ public class UserServiceImpl implements UserService {
     @Value("${sys.initPassword}")
     private String INIT_PASSWORD;
 
-    @Override
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        return userRepository.findByUsername(username).orElseGet(()-> {
-            throw new UsernameNotFoundException("用户名不存在");
-        });
-    }
+//    @Override
+//    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+//        return userRepository.findByUsername(username).orElseGet(()-> {
+//            throw new UsernameNotFoundException("用户名不存在");
+//        });
+//    }
 
-    @Override
-    public Optional<UserDto> getCurrUserInfo(){
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if(!Objects.isNull(authentication)){
-            return Optional.ofNullable(userMapper.toDto((User) authentication.getPrincipal()));
-        }
-        return Optional.empty();
-    }
+//    @Override
+//    public Optional<UserDto> getCurrUserInfo(){
+//        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+//        if(!Objects.isNull(authentication)){
+//            return Optional.ofNullable(userMapper.toDto((User) authentication.getPrincipal()));
+//        }
+//        return Optional.empty();
+//    }
 
     @Override
     public User registerUser(User user){
         //密码加密
-       user.setPassword(bCryptPasswordEncoder.encode(user.getPassword()));
-       if (userRepository.findByUsername(user.getUsername()).isPresent()){
-           throw new SystemErrorException("用户名已存在");
-       }
-
-       if(Objects.isNull(user.getRole())){
-           throw new SystemErrorException("角色不能为空");
-       }
-       roleRepository.findById(user.getRole().getId())
-               .orElseThrow(()->new SystemErrorException("角色不存在"));
+//       user.setPassword(bCryptPasswordEncoder.encode(user.getPassword()));
+//       if (userRepository.findByUsername(user.getUsername()).isPresent()){
+//           throw new SystemErrorException("用户名已存在");
+//       }
+//
+//       if(Objects.isNull(user.getRole())){
+//           throw new SystemErrorException("角色不能为空");
+//       }
+//       roleRepository.findById(user.getRole().getId())
+//               .orElseThrow(()->new SystemErrorException("角色不存在"));
         return userRepository.save(user);
     }
 
     @Override
     public void lockUser(Long id){
-        userRepository.findById(id).ifPresent(user->{
-            switch (user.getUseStatus()){
-                case ENABLED:
-                    user.setUseStatus(UseStatus.DISABLED);
-                    break;
-                case DISABLED:
-                    user.setUseStatus(UseStatus.ENABLED);
-                    break;
-            }
-            userRepository.save(user);
-        });
+//        userRepository.findById(id).ifPresent(user->{
+//            switch (user.getUseStatus()){
+//                case ENABLED:
+//                    user.setUseStatus(UseStatus.DISABLED);
+//                    break;
+//                case DISABLED:
+//                    user.setUseStatus(UseStatus.ENABLED);
+//                    break;
+//            }
+//            userRepository.save(user);
+//        });
+        Optional<User> user=userRepository.findById(id);
+        user.ifPresent(value -> userRepository.delete(value));
     }
 
     @Override
@@ -106,6 +96,11 @@ public class UserServiceImpl implements UserService {
            return userRepository.findByUsername(Username);
         }
       return Optional.empty();
+    }
+
+    @Override
+    public List<UserDto> findAllList() {
+        return userMapper.toDto(userRepository.findAll());
     }
 
     @Override
@@ -166,24 +161,24 @@ public class UserServiceImpl implements UserService {
         return user.map(userMapper::toDto);
     }
 
-    @Override
-    public int updatePassword(UserVo userVo) {
-        User user = userRepository.findById(userVo.getId()).orElseThrow(()-> new SystemErrorException("用户不存在"));
-        if(bCryptPasswordEncoder.matches(userVo.oldPassword,user.getPassword())){
-            //密码加密
-            user.setPassword(bCryptPasswordEncoder.encode(userVo.getNewPassword()));
-            userRepository.save(user);
-            return 0;
-        }else {
-            return -1;
-        }
-    }
+//    @Override
+//    public int updatePassword(UserVo userVo) {
+//        User user = userRepository.findById(userVo.getId()).orElseThrow(()-> new SystemErrorException("用户不存在"));
+//        if(bCryptPasswordEncoder.matches(userVo.oldPassword,user.getPassword())){
+//            //密码加密
+//            user.setPassword(bCryptPasswordEncoder.encode(userVo.getNewPassword()));
+//            userRepository.save(user);
+//            return 0;
+//        }else {
+//            return -1;
+//        }
+//    }
 
-    @Override
-    public void resetPassword(Long userId) {
-        userRepository.findById(userId).ifPresent(user ->{
-            user.setPassword(bCryptPasswordEncoder.encode(INIT_PASSWORD));
-            userRepository.save(user);
-        });
-    }
+//    @Override
+//    public void resetPassword(Long userId) {
+//        userRepository.findById(userId).ifPresent(user ->{
+//            user.setPassword(bCryptPasswordEncoder.encode(INIT_PASSWORD));
+//            userRepository.save(user);
+//        });
+//    }
 }

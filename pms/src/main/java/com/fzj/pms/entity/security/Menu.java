@@ -26,9 +26,6 @@ import java.util.Set;
 @Getter
 @Setter
 @Table(name = "t_menu")
-@ApiModel("菜单")
-@SQLDelete(sql = "update t_menu set delete_flag="+ Constants.DELETED+" where id= ?")
-@Where(clause = "delete_flag="+ Constants.NORMEL)
 public class Menu extends Base {
 
     @NotBlank(message = "菜单名称不能为空")
