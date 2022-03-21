@@ -2,12 +2,15 @@ package com.fzj.pms.entity.pms;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fzj.pms.entity.enums.Constants;
 import com.fzj.pms.entity.enums.Storey;
 import com.fzj.pms.entity.security.Base;
 import com.fzj.pms.entity.security.User;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.Where;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
@@ -16,6 +19,8 @@ import javax.validation.constraints.NotNull;
 @Table(name = "t_house")
 @Entity
 @EqualsAndHashCode(callSuper = true)
+@SQLDelete(sql = "update t_house set delete_flag="+Constants.DELETED+" where id= ?")
+@Where(clause = "delete_flag="+ Constants.NORMEL)
 public class House extends Base {
 
     /**

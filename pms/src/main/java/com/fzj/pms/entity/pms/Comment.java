@@ -1,9 +1,12 @@
 package com.fzj.pms.entity.pms;
 
+import com.fzj.pms.entity.enums.Constants;
 import com.fzj.pms.entity.security.Base;
 import com.fzj.pms.entity.security.User;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.Where;
 
 import javax.persistence.Entity;
 import javax.persistence.JoinColumn;
@@ -15,6 +18,8 @@ import javax.validation.constraints.NotNull;
 @Entity
 @Table(name="t_comment")
 @EqualsAndHashCode(callSuper = true)
+@SQLDelete(sql = "update t_comment set delete_flag="+Constants.DELETED+" where id= ?")
+@Where(clause = "delete_flag="+ Constants.NORMEL)
 public class Comment extends Base {
 
     @NotNull(message = "评论发布人不能为空")

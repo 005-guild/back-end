@@ -1,11 +1,14 @@
 package com.fzj.pms.entity.pms;
 
+import com.fzj.pms.entity.enums.Constants;
 import com.fzj.pms.entity.enums.RepairsStatus;
 import com.fzj.pms.entity.security.Base;
 import com.fzj.pms.entity.security.User;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.Where;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
@@ -17,6 +20,8 @@ import java.util.Date;
 @EqualsAndHashCode(callSuper = true)
 @Entity
 @Table(name = "t_repairs")
+@SQLDelete(sql = "update t_repairs set delete_flag="+Constants.DELETED+" where id= ?")
+@Where(clause = "delete_flag="+ Constants.NORMEL)
 public class Repairs extends Base {
 
     @NotNull(message = "报修人不能为空")

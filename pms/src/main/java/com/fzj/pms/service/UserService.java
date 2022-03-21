@@ -3,6 +3,8 @@ package com.fzj.pms.service;
 import com.fzj.pms.entity.dto.UserDto;
 import com.fzj.pms.entity.security.User;
 import com.fzj.pms.entity.vo.UserVo;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 import java.util.Optional;
@@ -29,7 +31,14 @@ public interface UserService {
      *
      * @param id
      */
-    void lockUser(Long id);
+    boolean lockUser(Long id);
+
+    /**
+     * 删除用户
+     *
+     * @param id
+     */
+    boolean deleteUser(long id);
 
     /**
      * 根据用户名查询用户
@@ -65,7 +74,14 @@ public interface UserService {
      * @param user
      * @return
      */
-    List<UserDto> search(User user);
+    List<UserDto> listSearch(User user,int pageSize,int curentPage);
+
+    /**
+     * 模糊搜索
+     * @param user
+     * @return
+     */
+    Page<User> pageSearch(User user,int pageSize,int curentPage);
 
     /**
      * 通过id 查询用户
@@ -73,6 +89,13 @@ public interface UserService {
      * @return
      */
     Optional<UserDto> findUser(Long id);
+
+//    /**
+//     * 分页查询用户
+//     * @param id
+//     * @return
+//     */
+//    Page<User> findUserListByPage(int pageSize,int curentPage);
 
 //    /**
 //     * 更新密码

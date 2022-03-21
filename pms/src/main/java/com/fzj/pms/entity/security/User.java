@@ -9,10 +9,6 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.Where;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.userdetails.UserDetails;
-
 import javax.persistence.*;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
@@ -20,17 +16,13 @@ import javax.validation.constraints.Pattern;
 import java.math.BigDecimal;
 import java.util.Collection;
 
-/**
- * @program: User
- * @description: 用户表
- * @author: fzy
- * @date: 2019/03/17 12:13:14
- **/
 @EqualsAndHashCode(callSuper = true)
 @Data
 @Entity
 @Table(name="t_user")
-public class User extends Base implements UserDetails{
+@SQLDelete(sql = "update t_user set delete_flag="+Constants.DELETED+" where id= ?")
+@Where(clause = "delete_flag="+ Constants.NORMEL)
+public class User extends Base {
 
     @NotBlank(message = "用户名不能为空")
     //@Column(unique = true)
@@ -38,6 +30,8 @@ public class User extends Base implements UserDetails{
 
     @NotBlank(message = "密码不能为空")
     private String password;
+
+    private String sex;
 
     @Email(message = "邮箱不符合规则")
     private String email;
@@ -49,44 +43,53 @@ public class User extends Base implements UserDetails{
     @NotBlank(message = "名字不能为空")
     private String realName;
 
-    @ApiModelProperty("账户余额")
-    @Column(columnDefinition = "decimal(19,2) default 0")
-    private BigDecimal balance=BigDecimal.ZERO;
-
-    @ApiModelProperty("激活用户状态")
     @Enumerated(EnumType.STRING)
     private UseStatus useStatus= UseStatus.ENABLED;
 
     @ManyToOne(cascade = CascadeType.REFRESH,fetch = FetchType.EAGER)
-    @JoinColumn(name = "role_id", referencedColumnName="id",nullable = false)
+    @JoinColumn(name = "role_id", referencedColumnName="id",nullable = true)
     private Role role;
 
     @Override
-    public Collection<? extends GrantedAuthority> getAuthorities() {
-        return Sets.newHashSet(new SimpleGrantedAuthority(role.getName()));
+    public String toString() {
+        return "User{" +
+                "username='" + username + '\'' +
+                ", password='" + password + '\'' +
+                ", sex='" + sex + '\'' +
+                ", email='" + email + '\'' +
+                ", phone='" + phone + '\'' +
+                ", realName='" + realName + '\'' +
+                ", useStatus=" + useStatus +
+                ", role=" + role +
+                '}';
     }
 
-    @Override
-    public String getUsername() {
-        return this.username;
-    }
-
-    @Override
-    public boolean isAccountNonExpired() {
-        return true;
-    }
-
-    @Override
-    public boolean isAccountNonLocked() {
-        return true;
-    }
-
-    @Override
-    public boolean isCredentialsNonExpired() {
-        return true;
-    }
-
-    @Override
+    //    @Override
+//    public Collection<? extends GrantedAuthority> getAuthorities() {
+//        return Sets.newHashSet(new SimpleGrantedAuthority(role.getName()));
+//    }
+//
+//    @Override
+//    public String getUsername() {
+//        return this.username;
+//    }
+//
+//    @Override
+//    public boolean isAccountNonExpired() {
+//        return true;
+//    }
+//
+//    @Override
+//    public boolean isAccountNonLocked() {
+//        return true;
+//    }
+//
+//    @Override
+//    public boolean isCredentialsNonExpired() {
+//        return true;
+//    }
+//
+    //@Override
     public boolean isEnabled() {
         return useStatus.equals(UseStatus.ENABLED);
     }

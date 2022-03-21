@@ -40,20 +40,20 @@ public class MenuServiceImpl implements MenuService {
         return createTree(0L,menuList);
     }
 
-    @Override
-    public Set<MenuDto> getCurrMenuTree() {
-        if(userService.getCurrUserInfo().isPresent()){
-            UserDto userInfo = userService.getCurrUserInfo().get();
-            List<Menu> menus = menuRepository.findByRole(userInfo.getRole().getId());
-            if(!ListUtils.isEmpty(menus)){
-                Map<Long, List<Menu>> listMenu = menus.stream().collect(Collectors.groupingBy(Menu::getPid));
-                return createTree(0L, listMenu);
-            }else {
-                return Collections.emptySet();
-            }
-        }
-        throw new SystemErrorException("当前用户不存在!!!");
-    }
+//    @Override
+//    public Set<MenuDto> getCurrMenuTree() {
+//        if(userService.getCurrUserInfo().isPresent()){
+//            UserDto userInfo = userService.getCurrUserInfo().get();
+//            List<Menu> menus = menuRepository.findByRole(userInfo.getRole().getId());
+//            if(!ListUtils.isEmpty(menus)){
+//                Map<Long, List<Menu>> listMenu = menus.stream().collect(Collectors.groupingBy(Menu::getPid));
+//                return createTree(0L, listMenu);
+//            }else {
+//                return Collections.emptySet();
+//            }
+//        }
+//        throw new SystemErrorException("当前用户不存在!!!");
+//    }
 
     @Override
     public MenuDto create(Menu menu) {

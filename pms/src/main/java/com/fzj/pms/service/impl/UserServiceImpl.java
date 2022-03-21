@@ -12,12 +12,19 @@ import com.fzj.pms.service.UserService;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+import org.springframework.util.DigestUtils;
 
 import javax.annotation.Resource;
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Predicate;
+import javax.persistence.criteria.Root;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -38,8 +45,8 @@ public class UserServiceImpl implements UserService {
     @Resource
     private UserMapper userMapper;
 
-    @Value("${sys.initPassword}")
-    private String INIT_PASSWORD;
+//    @Value("${sys.initPassword}")
+//    private String INIT_PASSWORD;
 
 //    @Override
 //    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
@@ -61,9 +68,12 @@ public class UserServiceImpl implements UserService {
     public User registerUser(User user){
         //密码加密
 //       user.setPassword(bCryptPasswordEncoder.encode(user.getPassword()));
-//       if (userRepository.findByUsername(user.getUsername()).isPresent()){
-//           throw new SystemErrorException("用户名已存在");
-//       }
+       if (userRepository.findByUsername(user.getUsername()).isPresent()){
+           throw new SystemErrorException("用户名已存在");
+       }
+
+       //md5加密
+        user.setPassword(DigestUtils.md5DigestAsHex(user.getPassword().getBytes()));
 //
 //       if(Objects.isNull(user.getRole())){
 //           throw new SystemErrorException("角色不能为空");
@@ -74,7 +84,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void lockUser(Long id){
+    public boolean lockUser(Long id){
 //        userRepository.findById(id).ifPresent(user->{
 //            switch (user.getUseStatus()){
 //                case ENABLED:
@@ -86,8 +96,18 @@ public class UserServiceImpl implements UserService {
 //            }
 //            userRepository.save(user);
 //        });
+        return false;
+    }
+
+    @Override
+    public boolean deleteUser(long id) {
         Optional<User> user=userRepository.findById(id);
-        user.ifPresent(value -> userRepository.delete(value));
+        if(user.isEmpty()){
+            return false;
+        }else{
+            user.ifPresent(value -> userRepository.delete(value));
+            return true;
+        }
     }
 
     @Override
@@ -125,35 +145,120 @@ public class UserServiceImpl implements UserService {
             detail.setPhone(user.getPhone());
             detail.setEmail(user.getEmail());
             detail.setRole(user.getRole());
+            detail.setSex(user.getSex());
+            detail.setUseStatus(user.getUseStatus());
             userRepository.save(detail);
         });
         return true;
     }
 
     @Override
-    public List<UserDto> search(User user) {
-        List list = userRepository.findAll((Specification<User>) (root, query, criteriaBuilder) -> {
-            List<Predicate> predicates = new ArrayList<>();
-            if (StringUtils.isNotBlank(user.getRealName())) {
-                predicates.add(criteriaBuilder.like(root.get("realName"), "%" + user.getRealName() + "%"));
-            }
+    public List<UserDto> listSearch(User user,int pageSize,int curentPage){
+        if(pageSize == 0) {
+            pageSize = 10 ;
+        }
+        if(curentPage < 1){
+            curentPage = 1 ;
+        }
+        List<User> result=null;
+        Sort sort = Sort.by(Sort.Direction.DESC,"createTime");
+        Pageable pageable = PageRequest.of(curentPage-1,pageSize,sort);
+        // 构造自定义查询条件
+        Specification<User> specification = new Specification<User>() {
+            @Override
+            public Predicate toPredicate(Root<User> root, CriteriaQuery<?> query, CriteriaBuilder criteriaBuilder) {
+                List<Predicate> predicates = new ArrayList<>();
+                if (StringUtils.isNotBlank(user.getRealName())) {
+                   predicates.add(criteriaBuilder.like(root.get("realName"), "%" + user.getRealName() + "%"));
+                }
 
-            if (StringUtils.isNotBlank((user.getPhone()))){
-                predicates.add(criteriaBuilder.like(root.get("phone"), user.getPhone() + "%"));
-            }
+                if (StringUtils.isNotBlank(user.getUsername())){
+                   predicates.add(criteriaBuilder.like(root.get("username"),user.getUsername() + "%"));
+                }
 
-            if (StringUtils.isNotBlank((user.getEmail()))){
-                predicates.add(criteriaBuilder.like(root.get("email"), user.getEmail() + "%"));
-            }
+                if (StringUtils.isNotBlank((user.getPhone()))){
+                   predicates.add(criteriaBuilder.like(root.get("phone"), user.getPhone() + "%"));
+                }
 
-            if(!Objects.isNull(user.getRole().getId())){
-                predicates.add((criteriaBuilder.equal(root.get("role"), user.getRole())));
-            }
+                if (StringUtils.isNotBlank((user.getEmail()))){
+                   predicates.add(criteriaBuilder.like(root.get("email"), user.getEmail() + "%"));
+                }
 
-            return criteriaBuilder.and(predicates.toArray(new Predicate[0]));
-        }, Sort.by(Sort.Direction.DESC, "createTime"));
-        return userMapper.toDto(list);
+//                if(!Objects.isNull(user.getRole().getId())){
+//                   predicates.add((criteriaBuilder.equal(root.get("role"), user.getRole())));
+//                }
+                return criteriaBuilder.and(predicates.toArray(new Predicate[0]));
+            }
+        };
+
+        result = userRepository.findAll(specification,pageable).getContent();
+
+        return userMapper.toDto(result);
     }
+
+    @Override
+    public Page<User> pageSearch(User user, int pageSize, int curentPage) {
+        Sort sort = Sort.by(Sort.Direction.DESC,"createTime");
+        Pageable pageable = PageRequest.of(curentPage-1,pageSize,sort);
+        // 构造自定义查询条件
+        Specification<User> specification = new Specification<User>() {
+            @Override
+            public Predicate toPredicate(Root<User> root, CriteriaQuery<?> query, CriteriaBuilder criteriaBuilder) {
+                List<Predicate> predicates = new ArrayList<>();
+                if (StringUtils.isNotBlank(user.getRealName())) {
+                    predicates.add(criteriaBuilder.like(root.get("realName"), "%" + user.getRealName() + "%"));
+                }
+
+                if (StringUtils.isNotBlank(user.getUsername())){
+                    predicates.add(criteriaBuilder.like(root.get("username"),user.getUsername() + "%"));
+                }
+
+                if (StringUtils.isNotBlank((user.getPhone()))){
+                    predicates.add(criteriaBuilder.like(root.get("phone"), user.getPhone() + "%"));
+                }
+
+                if (StringUtils.isNotBlank((user.getEmail()))){
+                    predicates.add(criteriaBuilder.like(root.get("email"), user.getEmail() + "%"));
+                }
+
+//                if(!Objects.isNull(user.getRole().getId())){
+//                   predicates.add((criteriaBuilder.equal(root.get("role"), user.getRole())));
+//                }
+                return criteriaBuilder.and(predicates.toArray(new Predicate[0]));
+            }
+        };
+
+        return userRepository.findAll(specification,pageable);
+    }
+
+    //    @Override
+//    public List<UserDto> search(User user) {
+//        List list = userRepository.findAll((Specification<User>) (root, query, criteriaBuilder) -> {
+//            List<Predicate> predicates = new ArrayList<>();
+//            if (StringUtils.isNotBlank(user.getRealName())) {
+//                predicates.add(criteriaBuilder.like(root.get("realName"), "%" + user.getRealName() + "%"));
+//            }
+//
+//            if (StringUtils.isNotBlank(user.getUsername())){
+//                predicates.add(criteriaBuilder.like(root.get("username"),user.getUsername() + "%"));
+//            }
+//
+//            if (StringUtils.isNotBlank((user.getPhone()))){
+//                predicates.add(criteriaBuilder.like(root.get("phone"), user.getPhone() + "%"));
+//            }
+//
+//            if (StringUtils.isNotBlank((user.getEmail()))){
+//                predicates.add(criteriaBuilder.like(root.get("email"), user.getEmail() + "%"));
+//            }
+//
+//            if(!Objects.isNull(user.getRole().getId())){
+//                predicates.add((criteriaBuilder.equal(root.get("role"), user.getRole())));
+//            }
+//
+//            return criteriaBuilder.and(predicates.toArray(new Predicate[0]));
+//        }, Sort.by(Sort.Direction.DESC, "createTime"));
+//        return userMapper.toDto(list);
+//    }
 
     @Override
     public Optional<UserDto> findUser(Long id) {
@@ -180,5 +285,16 @@ public class UserServiceImpl implements UserService {
 //            user.setPassword(bCryptPasswordEncoder.encode(INIT_PASSWORD));
 //            userRepository.save(user);
 //        });
+//    }
+
+//
+//    @Override
+//    public Page<User> findUserListByPage(int pageSize,int curentPage) {
+//        if(curentPage < 1){
+//            curentPage=1;
+//        }
+//        Sort sort = Sort.by(Sort.Direction.DESC,"id");
+//        Pageable pageable = PageRequest.of(curentPage-1,pageSize,sort);
+//        return userRepository.findAll(pageable);
 //    }
 }

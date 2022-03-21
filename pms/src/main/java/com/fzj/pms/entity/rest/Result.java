@@ -29,6 +29,14 @@ public class Result<T> {
         return result;
     }
 
+    public static<T> Result success(String message,T data){
+        Result<T> result=new Result<>();
+        result.setRestCode(RestCode.SUCCESS);
+        result.setMessage(message);
+        result.setData(data);
+        return result;
+    }
+
     public static Result failure(RestCode code){
         Result result=new Result();
         result.setRestCode(code);

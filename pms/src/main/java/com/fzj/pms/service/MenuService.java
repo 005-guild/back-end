@@ -17,7 +17,7 @@ public interface MenuService {
      * 查询当前用户菜单列表
      * @return
      */
-    Set<MenuDto> getCurrMenuTree();
+//    Set<MenuDto> getCurrMenuTree();
 
     /**
      * 创建菜单

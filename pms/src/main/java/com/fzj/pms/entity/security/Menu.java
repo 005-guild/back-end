@@ -16,16 +16,12 @@ import javax.persistence.Table;
 import javax.validation.constraints.NotBlank;
 import java.util.Set;
 
-/**
- * @program: Menu
- * @description:
- * @author: fzy
- * @date: 2019/03/18 22:16:27
- **/
 @Entity
 @Getter
 @Setter
 @Table(name = "t_menu")
+@SQLDelete(sql = "update t_menu set delete_flag="+Constants.DELETED+" where id= ?")
+@Where(clause = "delete_flag="+ Constants.NORMEL)
 public class Menu extends Base {
 
     @NotBlank(message = "菜单名称不能为空")
@@ -40,7 +36,7 @@ public class Menu extends Base {
     @NotBlank(message = "组件不能为空")
     private String component;
 
-    @Column(columnDefinition="bigint default 0",nullable = false)
+    //@Column(columnDefinition="bigint default 0",nullable = false)
     private Long pid;
 
     @ManyToMany(mappedBy = "menus")

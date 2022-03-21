@@ -11,18 +11,12 @@ import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import java.util.Set;
 
-/**
- * @program: Role
- * @description: 角色表
- * @author: fzy
- * @date: 2019/03/17 12:13:14
- **/
-
-
 @Entity
 @Table(name="t_role")
 @Getter
 @Setter
+@SQLDelete(sql = "update t_role set delete_flag="+Constants.DELETED+" where id= ?")
+@Where(clause = "delete_flag="+ Constants.NORMEL)
 public class Role extends Base {
 
     @Column(length = 25)
