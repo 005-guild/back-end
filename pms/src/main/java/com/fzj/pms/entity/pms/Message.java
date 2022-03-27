@@ -34,4 +34,14 @@ public class Message extends Base {
 
     @Enumerated(EnumType.STRING)
     private MessageStatus messageStatus;
+
+    @Override
+    public String toString() {
+        return "Message{" +
+                "user=" + user +
+                ", receiver=" + receiver +
+                ", messageContent='" + messageContent + '\'' +
+                ", messageStatus=" + messageStatus +
+                '}';
+    }
 }

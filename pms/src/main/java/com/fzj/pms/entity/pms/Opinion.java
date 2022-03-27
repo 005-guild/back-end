@@ -18,7 +18,7 @@ import java.util.Date;
 @EqualsAndHashCode(callSuper = true)
 @Entity
 @Table(name = "t_opinion")
-@SQLDelete(sql = "update t_opintion set delete_flag="+Constants.DELETED+" where id= ?")
+@SQLDelete(sql = "update t_opinion set delete_flag="+Constants.DELETED+" where id= ?")
 @Where(clause = "delete_flag="+ Constants.NORMEL)
 public class Opinion extends Base {
 
@@ -27,10 +27,12 @@ public class Opinion extends Base {
     @JoinColumn(name = "user_id")
     private User user;
 
+    private String opinionTitle;
+
     @NotBlank(message = "内容不能为空")
     private String opinionContent;
 
-    private int replyId;
+    private Long replyId;
 
     private String replyContent;
 
@@ -39,4 +41,17 @@ public class Opinion extends Base {
 
     @Enumerated(EnumType.STRING)
     private ReplyStatus replyStatus;
+
+    @Override
+    public String toString() {
+        return "Opinion{" +
+                "user=" + user +
+                ", opinionTitle='" + opinionTitle + '\'' +
+                ", opinionContent='" + opinionContent + '\'' +
+                ", replyId=" + replyId +
+                ", replyContent='" + replyContent + '\'' +
+                ", replyDate=" + replyDate +
+                ", replyStatus=" + replyStatus +
+                '}';
+    }
 }

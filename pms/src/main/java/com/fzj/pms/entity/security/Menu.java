@@ -9,11 +9,10 @@ import lombok.Setter;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.Where;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.ManyToMany;
-import javax.persistence.Table;
+import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 
 @Entity
@@ -24,11 +23,22 @@ import java.util.Set;
 @Where(clause = "delete_flag="+ Constants.NORMEL)
 public class Menu extends Base {
 
+    private Long pid;
+
+    private String parentName;
+
     @NotBlank(message = "菜单名称不能为空")
     private String name;
 
+    @NotBlank(message = "权限字段不能为空")
+    private String menuCode;
+
+    private String pathName;
+
     @NotBlank(message = "url 不能为空")
     private String path;
+
+    private String type;
 
     @NotBlank(message = "图标不能为空")
     private String icon;
@@ -36,10 +46,17 @@ public class Menu extends Base {
     @NotBlank(message = "组件不能为空")
     private String component;
 
-    //@Column(columnDefinition="bigint default 0",nullable = false)
-    private Long pid;
+    private Long orderNum;
+
+    private String remark;
+
+//    //@Column(columnDefinition="bigint default 0",nullable = false)
+//    private Long pid;
 
     @ManyToMany(mappedBy = "menus")
     @JsonIgnore
     private Set<Role> roles;
+
+    @Transient
+    private List<Menu> children = new ArrayList<>();
 }

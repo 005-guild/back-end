@@ -1,7 +1,11 @@
 package com.fzj.pms.dao;
 
 import com.fzj.pms.entity.security.Role;
+import com.fzj.pms.entity.security.User;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -22,6 +26,10 @@ public interface RoleRepository extends JpaRepository<Role ,Long> {
     int deleteRoleByIdIn(@Param("ids") Set<Long> ids);
 
     List<Role> findRoleByNameLike(String name, Sort sort);
+
+    Page<Role> findAllByName(String name, Pageable pageable);
+
+    Page<Role> findAll(Specification<Role> specification, Pageable pageable);
 
     Optional<Role> findRoleByName(String name);
 }

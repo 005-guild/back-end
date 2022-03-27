@@ -64,6 +64,17 @@ public class UserServiceImpl implements UserService {
 //        return Optional.empty();
 //    }
 
+
+    @Override
+    public Optional<User> findById(Long id) {
+        return userRepository.findById(id);
+    }
+
+    @Override
+    public Optional<User> findByUserNameAndPassword(String username, String password) {
+        return userRepository.findByUsernameAndPassword(username, password);
+    }
+
     @Override
     public User registerUser(User user){
         //密码加密
@@ -119,18 +130,6 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public List<UserDto> findAllList() {
-        return userMapper.toDto(userRepository.findAll());
-    }
-
-    @Override
-    public List<UserDto> findAllListSortCreateTime() {
-        //Sort sort=new Sort(Sort.Direction.DESC,"createTime");
-        Sort sort= Sort.by(Sort.Direction.DESC,"createTime");
-        return userMapper.toDto(userRepository.findAll(sort));
-    }
-
-    @Override
     public Boolean updateUserInfo(User user) {
         //查询用户名是否存在
         Optional<User> dbUser = userRepository.findByUsername(user.getUsername());
@@ -153,16 +152,16 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public List<UserDto> listSearch(User user,int pageSize,int curentPage){
+    public List<UserDto> listSearch(User user,int pageSize,int currentPage){
         if(pageSize == 0) {
             pageSize = 10 ;
         }
-        if(curentPage < 1){
-            curentPage = 1 ;
+        if(currentPage < 1){
+            currentPage = 1 ;
         }
         List<User> result=null;
         Sort sort = Sort.by(Sort.Direction.DESC,"createTime");
-        Pageable pageable = PageRequest.of(curentPage-1,pageSize,sort);
+        Pageable pageable = PageRequest.of(currentPage-1,pageSize,sort);
         // 构造自定义查询条件
         Specification<User> specification = new Specification<User>() {
             @Override
@@ -173,7 +172,7 @@ public class UserServiceImpl implements UserService {
                 }
 
                 if (StringUtils.isNotBlank(user.getUsername())){
-                   predicates.add(criteriaBuilder.like(root.get("username"),user.getUsername() + "%"));
+                   predicates.add(criteriaBuilder.like(root.get("username"),"%"+ user.getUsername() + "%"));
                 }
 
                 if (StringUtils.isNotBlank((user.getPhone()))){
@@ -197,9 +196,15 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public Page<User> pageSearch(User user, int pageSize, int curentPage) {
+    public Page<User> pageSearch(User user, int pageSize, int currentPage) {
+        if(pageSize == 0) {
+            pageSize = 10 ;
+        }
+        if(currentPage < 1){
+            currentPage = 1 ;
+        }
         Sort sort = Sort.by(Sort.Direction.DESC,"createTime");
-        Pageable pageable = PageRequest.of(curentPage-1,pageSize,sort);
+        Pageable pageable = PageRequest.of(currentPage-1,pageSize,sort);
         // 构造自定义查询条件
         Specification<User> specification = new Specification<User>() {
             @Override
@@ -260,11 +265,6 @@ public class UserServiceImpl implements UserService {
 //        return userMapper.toDto(list);
 //    }
 
-    @Override
-    public Optional<UserDto> findUser(Long id) {
-        Optional<User> user = userRepository.findById(id);
-        return user.map(userMapper::toDto);
-    }
 
 //    @Override
 //    public int updatePassword(UserVo userVo) {

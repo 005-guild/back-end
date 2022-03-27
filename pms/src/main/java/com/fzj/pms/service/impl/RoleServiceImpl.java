@@ -11,12 +11,21 @@ import com.fzj.pms.exception.SystemErrorException;
 import com.fzj.pms.service.MenuService;
 import com.fzj.pms.service.RoleService;
 import com.google.common.collect.Maps;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.thymeleaf.util.SetUtils;
 
 import javax.annotation.Resource;
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Predicate;
+import javax.persistence.criteria.Root;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -84,16 +93,40 @@ public class RoleServiceImpl implements RoleService {
     }
 
     @Override
-    public List<RoleDto> search(String name) {
-        //Sort sort=new Sort(Sort.Direction.DESC, Collections.singletonList("id"));
-        Sort sort=Sort.by(Sort.Direction.DESC,"id");
-        List<RoleDto> list = roleMapper.toDto(roleRepository.findRoleByNameLike("%" + name + "%",sort));
-        Map<Long, Integer> map = getCiteNum(list);
-        list.forEach(roles->{
-            roles.setCiteNum(Objects.isNull(map.get(roles.getId()))?0:map.get(roles.getId()));
-        });
-        return list;
+    public Page<Role> searchByName(String name, int pageSize, int currentPage) {
+        if(pageSize == 0) {
+            pageSize = 10 ;
+        }
+        if(currentPage < 1){
+            currentPage = 1 ;
+        }
+        Sort sort = Sort.by(Sort.Direction.DESC,"createTime");
+        Pageable pageable = PageRequest.of(currentPage-1,pageSize,sort);
+        //return  roleRepository.findAllByName(name,pageable);
+        Specification<Role> specification = new Specification<Role>() {
+            @Override
+            public Predicate toPredicate(Root<Role> root, CriteriaQuery<?> query, CriteriaBuilder criteriaBuilder) {
+                List<Predicate> predicates = new ArrayList<>();
+                if (StringUtils.isNotBlank(name)) {
+                    predicates.add(criteriaBuilder.like(root.get("name"), "%" + name));
+                }
+                return criteriaBuilder.and(predicates.toArray(new Predicate[0]));
+            }
+        };
+        return roleRepository.findAll(specification,pageable);
     }
+
+    //    @Override
+//    public List<RoleDto> search(String name) {
+//        //Sort sort=new Sort(Sort.Direction.DESC, Collections.singletonList("id"));
+//        Sort sort=Sort.by(Sort.Direction.DESC,"id");
+//        List<RoleDto> list = roleMapper.toDto(roleRepository.findRoleByNameLike("%" + name + "%",sort));
+//        Map<Long, Integer> map = getCiteNum(list);
+//        list.forEach(roles->{
+//            roles.setCiteNum(Objects.isNull(map.get(roles.getId()))?0:map.get(roles.getId()));
+//        });
+//        return list;
+//    }
 
     /**
      * 获取当前角色的用户应用数

@@ -41,4 +41,14 @@ public class Door extends Base {
 
     public interface Save {
     }
+
+    @Override
+    public String toString() {
+        return "Door{" +
+                "useStatus=" + useStatus +
+                ", doorType=" + doorType +
+                ", user=" + user +
+                ", expireDate=" + expireDate +
+                '}';
+    }
 }

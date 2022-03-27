@@ -43,6 +43,17 @@ public class Park extends Base{
     @Enumerated(EnumType.STRING)
     private UseStatus useStatus;
 
+    @Override
+    public String toString() {
+        return "Park{" +
+                "user=" + user +
+                ", position='" + position + '\'' +
+                ", parkType=" + parkType +
+                ", expireDate=" + expireDate +
+                ", useStatus=" + useStatus +
+                '}';
+    }
+
     public interface Save {
     }
 }

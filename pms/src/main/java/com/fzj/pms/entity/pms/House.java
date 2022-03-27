@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fzj.pms.entity.enums.Constants;
 import com.fzj.pms.entity.enums.Storey;
+import com.fzj.pms.entity.enums.UseStatus;
 import com.fzj.pms.entity.security.Base;
 import com.fzj.pms.entity.security.User;
 import io.swagger.annotations.ApiModelProperty;
@@ -32,10 +33,13 @@ public class House extends Base {
      * optional 属性的默认值是true。
      */
 
-    @NotNull(groups = {Update.class},message = "用户不能为空")
-    @ManyToOne(fetch = FetchType.EAGER,optional = false)
+    @ManyToOne
     @JoinColumn(name = "user_id")
     private User user;
+
+    private String building;
+
+    private String unit;
 
     private String position;
 
@@ -43,10 +47,11 @@ public class House extends Base {
      * EnumType:  ORDINAL 枚举序数  默认选项（int）。eg:TEACHER 数据库存储的是 0
      *            STRING：枚举名称       (String)。eg:TEACHER 数据库存储的是 "TEACHER"
      */
-    @Enumerated(EnumType.STRING)
-    private Storey storey;
+//    @Enumerated(EnumType.STRING)
+//    private Storey storey;
 
-    private String cellName;
+    @Enumerated(EnumType.STRING)
+    private UseStatus useStatus;
 
     public interface Save {
     }

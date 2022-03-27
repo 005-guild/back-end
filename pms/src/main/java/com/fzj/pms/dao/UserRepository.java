@@ -22,6 +22,7 @@ public interface UserRepository extends JpaRepository<User,Long>{
     @Query(value ="update User set deleteFlag=1 where id=:id")
     int lockUser(@Param("id") Long id);
 
+    Optional<User> findByUsernameAndPassword(String username,String password);
 
 //    @Override
     Page<User> findAll(Specification<User> specification, Pageable pageable);

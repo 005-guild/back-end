@@ -2,6 +2,8 @@ package com.fzj.pms.service;
 
 import com.fzj.pms.entity.dto.RoleDto;
 import com.fzj.pms.entity.security.Role;
+import com.fzj.pms.entity.security.User;
+import org.springframework.data.domain.Page;
 
 import java.util.List;
 import java.util.Set;
@@ -40,11 +42,17 @@ public interface RoleService {
     int batchDelete(Set<Long> ids);
 
     /**
-     * 角色模糊搜索
-     * @param role
+     * 角色分页搜索
      * @return
      */
-    List<RoleDto> search(String role);
+    Page<Role> searchByName(String name,int pageSize,int currentPage);
+
+//    /**
+//     * 角色模糊搜索
+//     * @param role
+//     * @return
+//     */
+//    List<RoleDto> search(String role);
 
     /**
      * 根据id 查询用户

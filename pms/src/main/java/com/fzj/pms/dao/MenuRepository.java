@@ -1,6 +1,7 @@
 package com.fzj.pms.dao;
 
 import com.fzj.pms.entity.security.Menu;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
@@ -17,6 +18,8 @@ public interface MenuRepository extends JpaRepository<Menu,Long>, JpaSpecificati
      * @return
      */
     List<Menu> findByPid(Long Pid);
+
+    List<Menu> findByTypeIn(String[] types, Sort sort);
 
     /**
      * 根据角色查询菜单列表

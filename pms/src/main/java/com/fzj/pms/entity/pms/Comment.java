@@ -35,4 +35,14 @@ public class Comment extends Base {
     private String commentContent;
 
     private String commentStatus;
+
+    @Override
+    public String toString() {
+        return "Comment{" +
+                "user=" + user +
+                ", board=" + board +
+                ", commentContent='" + commentContent + '\'' +
+                ", commentStatus='" + commentStatus + '\'' +
+                '}';
+    }
 }

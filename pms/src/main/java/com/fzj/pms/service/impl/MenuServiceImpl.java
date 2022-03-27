@@ -10,6 +10,7 @@ import com.fzj.pms.service.MenuService;
 import com.fzj.pms.service.UserService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -33,31 +34,31 @@ public class MenuServiceImpl implements MenuService {
     private UserService userService;
 
     @Override
-    public Set<MenuDto> findAllByMenuTree() {
-        //分组后的menu列表
-        Map<Long, List<Menu>> menuList = menuRepository.findAll()
-                .stream().collect(Collectors.groupingBy(Menu::getPid));
-        return createTree(0L,menuList);
+    public List<Menu> findAllByMenuTree() {
+        Sort sort = Sort.by(Sort.Direction.ASC,"name");
+        List<Menu> menus = menuRepository.findAll(sort);
+        return createTree(menus,0L);
     }
 
-//    @Override
-//    public Set<MenuDto> getCurrMenuTree() {
-//        if(userService.getCurrUserInfo().isPresent()){
-//            UserDto userInfo = userService.getCurrUserInfo().get();
-//            List<Menu> menus = menuRepository.findByRole(userInfo.getRole().getId());
-//            if(!ListUtils.isEmpty(menus)){
-//                Map<Long, List<Menu>> listMenu = menus.stream().collect(Collectors.groupingBy(Menu::getPid));
-//                return createTree(0L, listMenu);
-//            }else {
-//                return Collections.emptySet();
-//            }
-//        }
-//        throw new SystemErrorException("当前用户不存在!!!");
-//    }
+    @Override
+    public List<Menu> getCurrMenuTree() {
+        String[] types = {"0","1"};
+        Sort sort = Sort.by(Sort.Direction.ASC,"orderNum");
+        List<Menu> menus = menuRepository.findByTypeIn(types,sort);
+        Menu menu = new Menu();
+        menu.setId(0L);
+        menu.setPid(-1L);
+        menu.setName("顶级菜单");
+        menus.add(menu);
+        //构造菜单树
+        List<Menu> menulist = createTree(menus, -1L);
+        return menulist;
+    }
 
     @Override
-    public MenuDto create(Menu menu) {
-        return menuMapper.toDto(menuRepository.save(menu));
+    public Menu create(Menu menu) {
+        //return menuMapper.toDto(menuRepository.save(menu));
+        return menuRepository.save(menu);
     }
 
     @Override
@@ -69,6 +70,12 @@ public class MenuServiceImpl implements MenuService {
             e.setName(menu.getName());
             e.setPath(menu.getPath());
             e.setPid(menu.getPid());
+            e.setOrderNum(menu.getOrderNum());
+            e.setMenuCode(menu.getMenuCode());
+            e.setParentName(menu.getParentName());
+            e.setPathName(menu.getPathName());
+            e.setRemark(menu.getRemark());
+            e.setType(menu.getType());
             menuRepository.save(e);
         });
     }
@@ -91,15 +98,18 @@ public class MenuServiceImpl implements MenuService {
      * @param menus
      * @return
      */
-    private Set<MenuDto> createTree(Long parentId, Map<Long, List<Menu>> menus){
-        return menus.get(parentId).stream().map(e -> {
-            MenuDto menuDTO = new MenuDto();
-            BeanUtils.copyProperties(e, menuDTO);
-            if (!Objects.isNull(menus.get(e.getId()))) {
-                menuDTO.setChildren(createTree(e.getId(), menus));
-            }
-            return menuDTO;
-        }).collect(Collectors.toCollection(TreeSet::new));
+    public List<Menu> createTree(List<Menu> menuList, Long pid) {
+        List<Menu> list = new ArrayList<>();
+        Optional.ofNullable(menuList).orElse(new ArrayList<>())
+                .stream()
+                .filter(item -> item != null && item.getPid().equals(pid))
+                .forEach(dom -> {
+                    Menu menu = new Menu();
+                    BeanUtils.copyProperties(dom, menu);
+                    List<Menu> menus = createTree(menuList, dom.getId());
+                    menu.setChildren(menus);
+                    list.add(menu);
+                });
+        return list;
     }
-
 }

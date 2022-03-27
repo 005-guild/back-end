@@ -29,8 +29,8 @@ public class Repairs extends Base {
     @JoinColumn(name = "user_id")
     private User user;
 
-    @NotBlank(message = "报修项目不能为空")
-    private String repairsType;
+//    @NotBlank(message = "报修项目不能为空")
+//    private String repairsType;
 
     private String remark;
 
@@ -43,17 +43,16 @@ public class Repairs extends Base {
     @NotBlank(message = "联系地址不能为空")
     private String linkAddress;
 
-    @Temporal(TemporalType.TIMESTAMP)
-    private Date repairsDate;
+//    @Temporal(TemporalType.TIMESTAMP)
+//    private Date repairsDate;
 
     @Temporal(TemporalType.TIMESTAMP)
     private Date finishDate;
 
-    private String repairsBillNo;
+//    private String repairsBillNo;
 
-    private BigDecimal repairsPrice;
+//    private BigDecimal repairsPrice;
 
     @Enumerated(EnumType.STRING)
     private RepairsStatus repairsStatus;
-
 }

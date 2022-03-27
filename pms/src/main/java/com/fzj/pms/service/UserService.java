@@ -12,6 +12,15 @@ import java.util.Optional;
 public interface UserService {
 
     /**
+     * 登录验证
+     *
+     * @return
+     */
+    Optional<User> findByUserNameAndPassword(String username,String password);
+
+    Optional<User> findById(Long id);
+
+    /**
      * 查询当前用户信息
      *
      * @return
@@ -49,20 +58,6 @@ public interface UserService {
     Optional<User> getUserByUsername(String Username);
 
     /**
-     * 查询全部用户列表
-     *
-     * @return
-     */
-    List<UserDto> findAllList();
-
-    /**
-     * 查询全部用户列表
-     *
-     * @return
-     */
-    List<UserDto> findAllListSortCreateTime();
-
-    /**
      * 更新用户信息
      * @param user
      * @return
@@ -81,21 +76,7 @@ public interface UserService {
      * @param user
      * @return
      */
-    Page<User> pageSearch(User user,int pageSize,int curentPage);
-
-    /**
-     * 通过id 查询用户
-     * @param id
-     * @return
-     */
-    Optional<UserDto> findUser(Long id);
-
-//    /**
-//     * 分页查询用户
-//     * @param id
-//     * @return
-//     */
-//    Page<User> findUserListByPage(int pageSize,int curentPage);
+    Page<User> pageSearch(User user,int pageSize,int currentPage);
 
 //    /**
 //     * 更新密码

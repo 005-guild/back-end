@@ -25,11 +25,11 @@ public class getUserListByPageTest {
 //        System.out.println(userPage.toString());
     }
 
-    @Test
-    public void deleteTest(){
-        long id=2;
-        if(userService.findUser(id).isPresent()){
-            userService.deleteUser(id);
-        }
-    }
+//    @Test
+//    public void deleteTest(){
+//        long id=2;
+//        if(userService.findUser(id).isPresent()){
+//            userService.deleteUser(id);
+//        }
+//    }
 }
