@@ -19,12 +19,28 @@ import javax.persistence.criteria.Root;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 @Service
 public class HouseServiceImpl implements HouseService {
 
     @Autowired
     private HouseRepository houseRepository;
+
+    @Override
+    public List<House> findByBuilding(String building) {
+        return houseRepository.findByBuilding(building);
+    }
+
+    @Override
+    public List<House> findByBuildingAndUnit(String building, String unit) {
+        return houseRepository.findByBuildingAndUnit(building,unit);
+    }
+
+    @Override
+    public Optional<House> findByBuildingAndUnitAndPosition(String building, String unit, String position) {
+        return houseRepository.findByBuildingAndUnitAndPosition(building, unit, position);
+    }
 
     @Override
     public void update(House house) {

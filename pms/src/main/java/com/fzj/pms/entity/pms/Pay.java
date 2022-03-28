@@ -1,7 +1,9 @@
 package com.fzj.pms.entity.pms;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fzj.pms.entity.enums.Constants;
 import com.fzj.pms.entity.enums.PayStatus;
+import com.fzj.pms.entity.enums.UseStatus;
 import com.fzj.pms.entity.security.Base;
 import com.fzj.pms.entity.security.Menu;
 import com.fzj.pms.entity.security.User;
@@ -11,6 +13,7 @@ import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.Where;
 
 import javax.persistence.*;
+import java.math.BigDecimal;
 import java.util.Date;
 import java.util.Set;
 
@@ -22,20 +25,25 @@ import java.util.Set;
 @Where(clause = "delete_flag="+ Constants.NORMEL)
 public class Pay extends Base {
 
-    @ManyToMany(fetch = FetchType.EAGER)
-    @JoinTable(
-            name = "pays_user",
-            joinColumns = {@JoinColumn(name = "pay_id",referencedColumnName = "id")},
-            inverseJoinColumns = {@JoinColumn(name = "user_id",referencedColumnName = "id")})
-    private Set<User> users;
-
+    @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
     @Temporal(TemporalType.TIMESTAMP)
     private Date deadLine;
 
-    @Temporal(TemporalType.TIMESTAMP)
-    private Date finishDate;
+//    @Temporal(TemporalType.TIMESTAMP)
+//    private Date finishDate;
+
+    private String payName;
+
+    private String building;
+
+    private String unit;
+
+    private String position;
+
+    private BigDecimal money;
+
+    private int num;
 
     @Enumerated(EnumType.STRING)
-    private PayStatus payStatus;
-
+    private UseStatus useStatus;
 }
